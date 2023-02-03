@@ -8,11 +8,11 @@ const {
 } = require("../controllers/authController");
 const { rateLimiter } = require("../controllers/rateLimiter");
 
-router.post("/signup", validateForm, rateLimiter(30, 4), handleSignUp);
+router.post("/signup", validateForm,  handleSignUp);
 
 router
 	.route("/login")
 	.get(handleLogin)
-	.post(validateForm, rateLimiter(60, 10), SignInAttempt);
+	.post(validateForm, SignInAttempt);
 
 module.exports = router;

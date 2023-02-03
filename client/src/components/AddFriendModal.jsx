@@ -17,19 +17,19 @@ import {
 import TextField from "./Login/TextField";
 import { Form, Formik } from "formik";
 import * as Yup from "yup";
-import { socket } from "../socket";
 import { useCallback, useContext } from "react";
 import { FriendContext } from "../Home";
-
+import { socketContext } from "../Home";
 
 const AddFriendModal = ({ isOpen, onClose }) => {
 	const [error, seterror] = useState("");
 	const { setFriendList } = useContext(FriendContext);
+	const { socket } = useContext(socketContext);
 
 	const closeModal = useCallback(() => {
-		seterror("")
-		onClose()
-	},[onClose])
+		seterror("");
+		onClose();
+	}, [onClose]);
 
 	return (
 		<Modal isOpen={isOpen} onClose={closeModal}>
@@ -51,13 +51,17 @@ const AddFriendModal = ({ isOpen, onClose }) => {
 							values.friendName,
 							({ done, errMsg, newUser }) => {
 								if (!done) {
-									seterror(errMsg?errMsg:'try again later bitch im busy');
+									seterror(
+										errMsg
+											? errMsg
+											: "try again later bitch im busy"
+									);
 								} else {
-									if(newUser){
-										setFriendList()
+									if (newUser) {
+										setFriendList();
 									}
 									closeModal();
-									return
+									return;
 								}
 							}
 						);
@@ -65,7 +69,9 @@ const AddFriendModal = ({ isOpen, onClose }) => {
 				>
 					<Form>
 						<ModalBody w={"100%"}>
-							<Header as="p" color="red.600">{error}</Header>
+							<Header as="p" color="red.600">
+								{error}
+							</Header>
 							<TextField
 								name="friendName"
 								label={"Friends name"}

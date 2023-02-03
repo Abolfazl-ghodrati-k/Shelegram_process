@@ -1,16 +1,21 @@
-const { socket } = require("../../client/src/socket");
 const redisClient = require("../redis");
 
 module.exports.Authorization = (socket, next) => {
-	if (!socket.request.session || !socket.rrequest.session.user) {
-		next(new Error("not authorized"));
-	} else {
-		next();
-	}
+	const token = socket.handshake.auth.token
+	jwt.verify(token, "dfdfbg455678678", (err, decoded) => {
+		if (err) {
+			socket.user = decoded
+			next()
+			return;
+		}
+		else {
+			next(new Error("not Authorized!"))
+		}
+	});
 };
 
 module.exports.initializeUser = async (socket) => {
-	socket.user = { ...socket.request.session.user };
+	// socket.user = { ...socket.request.session.user };
 	socket.join(socket.user.userId);
 	redisClient.hset(
 		`userid: ${socket.user.username}`,

@@ -11,8 +11,9 @@ const formSchema = Yup.object({
 		.max(28, "password too long"),
 });
 
-const validateForm = (req,res,next) => {
-    const formData = req.body;
+const validateForm = (req, res, next) => {
+	const formData = req.body;
+	// res.json(formData)
 	formSchema
 		.validate(formData)
 		.catch((err) => {
@@ -23,6 +24,6 @@ const validateForm = (req,res,next) => {
 				next()
 			}
 		});
-}
+};
 
-module.exports = validateForm
+module.exports = validateForm;

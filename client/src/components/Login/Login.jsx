@@ -31,7 +31,7 @@ function Login() {
 					headers: {
 						"Content-Type": "application/json",
 					},
-					
+
 					body: JSON.stringify(vals),
 				})
 					.catch((err) => {
@@ -46,6 +46,7 @@ function Login() {
 					.then((data) => {
 						if (!data) return;
 						setUser({ ...data });
+						localStorage.setItem("token", data.token);
 						navigate("/home");
 					});
 				actions.resetForm();

@@ -4,12 +4,15 @@ import { useNavigate } from "react-router-dom";
 export const AccountContext = createContext();
 
 const UserContext = ({ children }) => {
-	const [user, setUser] = useState({ loggedIn: true });
+	const [user, setUser] = useState({ loggedIn: null, token: localStorage.getItem("token") });
 	const navigate = useNavigate();
 	// useEffect(() => {
 	// 	fetch("http://localhost:5050/auth/login", {
 	// 		method: "GET",
 	// 		credentials: "include",
+	// 		headers:{
+    //            authorization: `Bearer ${user.token}`
+	// 		}
 	// 	})
 	// 		.catch((e) => {
 	// 			console.log(e);
