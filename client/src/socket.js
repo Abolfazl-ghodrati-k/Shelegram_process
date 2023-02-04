@@ -4,8 +4,7 @@ const socket = (user) =>
 	new io("http://localhost:5050", {
 		autoConnect: false,
 		withCredentials: true,
-		auth: {
-			token: user.token,
-		},
+		transports: ['websocket'],
+		query: {token: "Bearier " + user.token},
 	});
 export default socket;

@@ -4,24 +4,26 @@ import Chat from "./components/Chat";
 import { createContext, useState, useContext } from "react";
 import useSocketSetup from "./Hooks/useSocketSetup";
 import SocketConn from "./socket";
-import AccountContext from "./Context/AccountContext";
+import { AccountContext } from "./Context/AccountContext";
+import { useEffect } from "react";
 
 export const FriendContext = createContext();
 export const MessagesContext = createContext();
 export const socketContext = createContext();
 
 function Home() {
-	const { User } = useContext(AccountContext);
-
+	const { user } = useContext(AccountContext);
 	const [FriendList, setFriendList] = useState([]);
 	const [Messages, setMessages] = useState([]);
 	const [friendIndex, setfriendIndex] = useState(0);
-	const [socket, setSocket] = useState(() => SocketConn(User));
+	const [socket, setSocket] = useState(() => SocketConn(user));
+	console.log(user)
 	useSocketSetup(setFriendList, setMessages, socket);
+	// console.log(FriendList)
 
 	useEffect(() => {
-		setSocket(() => SocketConn(User));
-	}, [User]);
+		setSocket(() => SocketConn(user));
+	}, [user]);
 
 	return (
 		<FriendContext.Provider value={{ FriendList, setFriendList }}>
@@ -38,7 +40,7 @@ function Home() {
 						<MessagesContext.Provider
 							value={{ Messages, setMessages }}
 						>
-							<Chat userId={FriendList[friendIndex].userId} />
+							{/* <Chat userId={FriendList ? FriendList[friendIndex].userId : null} /> */}
 						</MessagesContext.Provider>
 					</GridItem>
 				</Grid>

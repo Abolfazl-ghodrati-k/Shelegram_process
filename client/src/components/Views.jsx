@@ -10,8 +10,8 @@ function Views() {
    <Routes>
       <Route path='/' element={<Login />}/>
       <Route path='/register' element={<SignUp />}/>
-      <Route path='/home' element={<PrivateRoutes />}>
-        <Route path='/home/' element={<Home />} />
+      <Route element={<PrivateRoutes />}>
+        <Route path='/home' element={<Home />} />
       </Route>
       <Route path='*' element={<Login />}/>
    </Routes>

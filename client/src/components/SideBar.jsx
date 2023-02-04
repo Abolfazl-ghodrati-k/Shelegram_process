@@ -30,10 +30,10 @@ function SideBar() {
 				</Button>
 			</HStack>
 			<Divider />
-			{FriendList.length > 0 ? (
+			{(FriendList && FriendList.length > 0) ? (
 				<VStack as={TabList}>
 					{FriendList.map((friend) => (
-					<HStack as={Tab} justify={"start"} w="100%">
+					<HStack as={Tab} justify={"start"} w="100%" key={friend.username}>
 						<Circle
 							bg={`${friend.connected ? "green.500" : "red.500"}`}
 							w={"20px"}

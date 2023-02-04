@@ -4,12 +4,15 @@ import * as Yup from "yup";
 import TextField from "./TextField";
 import { useNavigate } from "react-router-dom";
 import { ArrowBackIcon } from "@chakra-ui/icons";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { AccountContext } from "../../Context/AccountContext";
 
 function SignUp() {
 	const navigate = useNavigate();
 	const { setUser } = useContext(AccountContext);
+	useEffect(() => {
+		localStorage.removeItem("token")
+	})
 
 	return (
 		<Formik
@@ -36,18 +39,21 @@ function SignUp() {
 				})
 					.catch((err) => {
 						console.log(err);
+						localStorage.removeItem("token");
 						return;
 					})
 					.then((res) => {
 						if (!res || !res.ok || res.status >= 400) {
+							localStorage.removeItem("token");
 							return;
 						}
 						return res.json();
 					})
 					.then((data) => {
 						if (!data) return;
-						setUser({...data})
-						navigate('/home')
+						console.log(`signing up :`, data);
+						setUser({ ...data });
+						navigate("/home");
 					});
 			}}
 		>

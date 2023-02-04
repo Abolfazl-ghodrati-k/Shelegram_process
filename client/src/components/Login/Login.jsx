@@ -4,11 +4,14 @@ import * as Yup from "yup";
 import TextField from "./TextField";
 import { useNavigate } from "react-router-dom";
 import { AccountContext } from "../../Context/AccountContext";
-import { useContext } from "react";
+import { useContext,useEffect } from "react";
 
 function Login() {
 	const navigate = useNavigate();
 	const { setUser } = useContext(AccountContext);
+	useEffect(() => {
+		localStorage.removeItem("token")
+	})
 
 	return (
 		<Formik
@@ -45,6 +48,7 @@ function Login() {
 					})
 					.then((data) => {
 						if (!data) return;
+						console.log(`logging in :`, data)
 						setUser({ ...data });
 						localStorage.setItem("token", data.token);
 						navigate("/home");

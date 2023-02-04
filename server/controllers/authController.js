@@ -1,47 +1,59 @@
 const pool = require("../db");
 const bcrypt = require("bcrypt");
-const { v4: uuidV4 } = require("uuid");
-const jwt = require("bcrypt");
 const { jwtSign, jwtVerify, getJwt } = require("./jwt/jwtAuth");
+const { v4: uuidV4 } = require("uuid");
 
 module.exports.handleLogin = async (req, res) => {
 	const token = getJwt(req);
-	if(token){
-		res.json({loggedIn:false, message: "send Token!"})
+	if (!token) {
+		res.json({ loggedIn: false, message: "send Token!" });
+		return;
 	}
 	jwtVerify(token)
-		.catch((err) => res.json({ loggedIn: false, message: err }))
-		.then((decoded) => res.json({ loggedIn: true, token: decoded }));
+		.then((decoded) => {
+			res.json({ loggedIn: true, token: token });
+			return;
+		})
+		.catch((err) => {
+			res.json({
+				loggedIn: false,
+				message: "Error occured please login again",
+			});
+			return;
+		});
 };
 
 module.exports.handleSignUp = async (req, res) => {
 	const exsitingUser = await pool.query(
 		"SELECT username from users WHERE username=$1",
 		[req.body.username]
+	);
+	if (exsitingUser.rowCount == 0) {
+		const hashedPass = await bcrypt.hash(req.body.password, 10);
+		const newUserQuery = await pool.query(
+			"INSERT INTO users(username, passhash, userId) values($1,$2,$3) RETURNING id, userId",
+			[req.body.username, hashedPass, uuidV4()]
 		);
-		res.json({res:exsitingUser})
-	// if (exsitingUser.rowCount == 0) {
-	// 	const hashedPass = await bcrypt.hash(req.body.password, 10);
-	// 	const newUserQuery = await pool.query(
-	// 		"INSERT INTO users(username, passhash, userId) values($1,$2,$3) RETURNING id, userId",
-	// 		[req.body.username, hashedPass, uuidV4()]
-	// 	);
-	// 	jwtSign(
-	// 		{
-	// 			username: req.body.username,
-	// 			id: newUserQuery.rows[0].id,
-	// 			userId: newUserQuery.rows[0].id,
-	// 		},
-	// 		"dfdfbg455678678",
-	// 		{ expiresIn: "1min" }
-	// 	)
-	// 		.then((token) => res.json({ loggedIn: true, token }))
-	// 		.catch((err) =>
-	// 			res.json({ loggedIn: false, message: " try again later ..." })
-	// 		);
-	// } else {
-	// 	res.json({ loggedIn: false, status: "Username taken" });
-	// }
+		jwtSign(
+			{
+				username: req.body.username,
+				id: newUserQuery.rows[0].id,
+				userId: newUserQuery.rows[0].userid,
+			},
+			{ expiresIn: "1year" }
+		)
+			.then((token) => {
+				res.json({ loggedIn: true, token });
+				return;
+			})
+			.catch((err) => {
+				res.json({ loggedIn: false, message: " try again later ..." });
+				return;
+			});
+	} else {
+		res.json({ loggedIn: false, status: "Username taken" });
+		return;
+	}
 };
 
 module.exports.SignInAttempt = async (req, res) => {
@@ -59,28 +71,35 @@ module.exports.SignInAttempt = async (req, res) => {
 			jwtSign(
 				{
 					username: req.body.username,
-					id: newUserQuery.rows[0].id,
-					userId: newUserQuery.rows[0].id,
+					id: potentialLogin.rows[0].id,
+					userId: potentialLogin.rows[0].userid,
 				},
-				"dfdfbg455678678",
-				{ expiresIn: "1min" }
+				{ expiresIn: "1year" }
 			)
-				.then((token) => res.json({ loggedIn: true, token }))
-				.catch((err) =>
+				.then((token) => {
+					res.json({ loggedIn: true, token });
+					return;
+				})
+				.catch((err) => {
 					res.json({
 						loggedIn: false,
 						message: " try again later ...",
-					})
-				);
+					});
+					return;
+				});
 			1;
 		} else {
-			res.json({ loggedIn: false, message: "Wrong  password" });
+			res.json({
+				loggedIn: false,
+				message: "Wrong username or password",
+			});
+			return;
 		}
 	} else {
-		console.log("not good");
 		res.json({
 			loggedIn: false,
 			message: "Wrong username or password",
 		});
+		return;
 	}
 };

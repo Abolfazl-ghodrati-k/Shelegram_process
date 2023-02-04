@@ -1,19 +1,19 @@
 import { useContext, useEffect } from "react";
 import { AccountContext } from "../Context/AccountContext";
 
-export default function useSocketSetup({ setFriendList, setMessages, socket }) {
+export default function useSocketSetup(setFriendList, setMessages, socket) {
 	const { setUser } = useContext(AccountContext);
 	useEffect(() => {
 		socket.connect();
 		socket.on("friends", (FriendList) => {
 			setFriendList(FriendList);
 		});
-		socket.on("messages", (messages) => {
-			setMessages(messages);
-		});
-		socket.on("dm", (message) => {
-			setMessages((prev) => [message, ...prev]);
-		});
+		// socket.on("messages", (messages) => {
+		// 	setMessages(messages);
+		// });
+		// socket.on("dm", (message) => {
+		// 	setMessages((prev) => [message, ...prev]);
+		// });
 		socket.on("connected", (status, username) => {
 			setFriendList((prev) => {
 				const friends = [...prev];
@@ -25,7 +25,8 @@ export default function useSocketSetup({ setFriendList, setMessages, socket }) {
 				});
 			});
 		});
-		socket.on("connect_error", () => {
+		socket.on("connect_error", (err) => {
+			console.log(err);
 			setUser({ loggedIn: false });
 		});
 		return () => {

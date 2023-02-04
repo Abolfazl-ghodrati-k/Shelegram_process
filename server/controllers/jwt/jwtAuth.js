@@ -1,6 +1,9 @@
 const jwt = require("jsonwebtoken");
+require("dotenv").config();
 
-const jwtSign = (payload, secret, options) =>
+const secret = process.env.JWT_SECRET;
+
+const jwtSign = (payload, options) =>
 	new Promise((resolve, reject) => {
 		jwt.sign(payload, secret, options, (err, token) => {
 			if (err) {
@@ -11,12 +14,13 @@ const jwtSign = (payload, secret, options) =>
 	});
 
 const jwtVerify = (token) =>
-	new Promise(({ resolve, reject }) => {
-		jwt.verify(token, "dfdfbg455678678", (err, decoded) => {
+	new Promise(( resolve, reject ) => {
+		jwt.verify(token, secret, (err, decoded) => {
 			if (err) {
 				reject(err);
+			} else {
+				resolve(decoded);
 			}
-			resolve(decoded);
 		});
 	});
 

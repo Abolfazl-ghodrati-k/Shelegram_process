@@ -13,11 +13,12 @@ import {
 	FormControl,
 	FormErrorMessage,
 	FormLabel,
+	VStack,
 } from "@chakra-ui/react";
 import TextField from "./Login/TextField";
-import { Form, Formik } from "formik";
+import { Formik } from "formik";
 import * as Yup from "yup";
-import { useCallback, useContext } from "react";
+import { useCallback, useContext, useState, useEffect } from "react";
 import { FriendContext } from "../Home";
 import { socketContext } from "../Home";
 
@@ -41,24 +42,29 @@ const AddFriendModal = ({ isOpen, onClose }) => {
 					initialValues={{ friendName: "" }}
 					validationSchema={Yup.object({
 						friendName: Yup.string()
-							.required("Username required")
-							.min(6, "Username too short!")
-							.max(28, "Username too long!"),
+							.required("Friendname required")
+							.min(6, "Friendname too short!")
+							.max(28, "Friendname too long!"),
 					})}
-					onSubmit={({ values }) => {
+					onSubmit={(values) => {
 						socket.emit(
 							"add_friend",
 							values.friendName,
 							({ done, errMsg, newUser }) => {
 								if (!done) {
+									console.log("face a prob");
 									seterror(
 										errMsg
 											? errMsg
 											: "try again later bitch im busy"
 									);
+									setTimeout(() => {
+										seterror("");
+									}, 4000);
 								} else {
 									if (newUser) {
-										setFriendList();
+										setFriendList(prev => [...prev,newUser]);
+										console.log(newUser);
 									}
 									closeModal();
 									return;
@@ -67,23 +73,34 @@ const AddFriendModal = ({ isOpen, onClose }) => {
 						);
 					}}
 				>
-					<Form>
-						<ModalBody w={"100%"}>
-							<Header as="p" color="red.600">
-								{error}
-							</Header>
-							<TextField
-								name="friendName"
-								label={"Friends name"}
-								placeholder="enter your friends name"
-							/>
-						</ModalBody>
-						<ModalFooter w={"100%"}>
-							<Button colorScheme="blue" type="submit">
-								Submit
-							</Button>
-						</ModalFooter>
-					</Form>
+					{(formik) => (
+						<VStack
+							as={"form"}
+							w={{ base: "100%" }}
+							justify={"center"}
+							spacing={"1rem"}
+							onSubmit={(e) => {
+								e.preventDefault();
+								formik.handleSubmit();
+							}}
+						>
+							<ModalBody w={"100%"}>
+								<p fontSize='sm' align="center" color="red" >
+									{error}
+								</p>
+								<TextField
+									name="friendName"
+									label={"Friends name"}
+									placeholder="enter your friends name"
+								/>
+							</ModalBody>
+							<ModalFooter w={"100%"}>
+								<Button colorScheme="blue" type="submit">
+									Submit
+								</Button>
+							</ModalFooter>
+						</VStack>
+					)}
 				</Formik>
 			</ModalContent>
 		</Modal>
