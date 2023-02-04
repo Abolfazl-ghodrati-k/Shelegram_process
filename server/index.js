@@ -44,7 +44,7 @@ io.on("connection", (socket) => {
 	socket.on("add_friend", (friendName, cb) => {
 		AddFriend(socket, friendName, cb);
 	});
-	socket.on("disconnect", Disconnect);
+	socket.on("disconnect", () => Disconnect(socket));
 	socket.on("dm", (message) => dm(socket, message));
 });
 

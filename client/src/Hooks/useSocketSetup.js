@@ -1,7 +1,7 @@
 import { useContext, useEffect } from "react";
 import { AccountContext } from "../Context/AccountContext";
 
-export default function useSocketSetup(setFriendList, setMessages, socket) {
+export default function useSocketSetup( setFriendList, setMessages, socket) {
 	const { setUser } = useContext(AccountContext);
 	useEffect(() => {
 		socket.connect();
@@ -15,11 +15,11 @@ export default function useSocketSetup(setFriendList, setMessages, socket) {
 		// 	setMessages((prev) => [message, ...prev]);
 		// });
 		socket.on("connected", (status, username) => {
+			console.log(status,username)
 			setFriendList((prev) => {
-				const friends = [...prev];
-				return friends.map((friend) => {
-					if (friend.username === username) {
-						friend.status = status;
+				return prev.map((friend) => {
+					if (friend.username == username) {
+						friend.connected = status;
 					}
 					return friend;
 				});

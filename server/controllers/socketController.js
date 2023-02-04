@@ -19,7 +19,6 @@ module.exports.Authorization = (socket, next) => {
 };
 
 module.exports.initializeUser = async (socket) => {
-	// socket.user = { ...socket.request.session.user };
 	socket.join(socket.user.userId);
 	await redisClient.hset(
 		`userid:${socket.user.username}`,
@@ -56,6 +55,7 @@ module.exports.initializeUser = async (socket) => {
 };
 
 module.exports.Disconnect = async (socket) => {
+	console.log('disconnected')
 	await redisClient.hset(
 		`userid:${socket.user.username}`,
 		"connected",
@@ -64,12 +64,12 @@ module.exports.Disconnect = async (socket) => {
 	const friendList = await redisClient.lrange(
 		`friends:${socket.user.username}`,
 		0,
-		1
+		-1
 	);
-
 	const friendRooms = await parseFriendList(friendList).then((friends) =>
 		friends.map((friend) => friend.userId)
 	);
+
 	socket.to(friendRooms).emit("connected", false, socket.user.username);
 };
 
@@ -118,7 +118,7 @@ const parseFriendList = async (friendList) => {
 				newFriendList.push({
 					username: parsedFriend[0],
 					userId: parsedFriend[1],
-					connected: friendConnected,
+					connected: friendConnected == 'true',
 				});
 			}
 		}

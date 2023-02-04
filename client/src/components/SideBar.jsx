@@ -20,6 +20,7 @@ import AddFriendModal from './AddFriendModal'
 function SideBar() {
 	const { FriendList } = useContext(FriendContext);
 	const { isOpen, onOpen, onClose } = useDisclosure()
+	console.log(FriendList)
 	return (
 		<>
 		<VStack py={"1.4rem"} h={"100vh"}>

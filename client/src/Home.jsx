@@ -17,10 +17,9 @@ function Home() {
 	const [Messages, setMessages] = useState([]);
 	const [friendIndex, setfriendIndex] = useState(0);
 	const [socket, setSocket] = useState(() => SocketConn(user));
-	console.log(user)
-	useSocketSetup(setFriendList, setMessages, socket);
-	// console.log(FriendList)
-
+	// console.log(user)
+	useSocketSetup( setFriendList, setMessages, socket);
+	
 	useEffect(() => {
 		setSocket(() => SocketConn(user));
 	}, [user]);
@@ -40,7 +39,7 @@ function Home() {
 						<MessagesContext.Provider
 							value={{ Messages, setMessages }}
 						>
-							{/* <Chat userId={FriendList ? FriendList[friendIndex].userId : null} /> */}
+							<Chat userId={FriendList.length>0 ? FriendList[0].userId : null} />
 						</MessagesContext.Provider>
 					</GridItem>
 				</Grid>

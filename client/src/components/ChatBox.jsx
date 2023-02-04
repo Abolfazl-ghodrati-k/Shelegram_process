@@ -1,9 +1,10 @@
-import { HStack, Input } from "@chakra-ui/react";
+import { HStack, Input, Button } from "@chakra-ui/react";
 import { Formik } from "formik";
 import React, { useContext } from "react";
 import * as Yup from "yup";
 import { MessagesContext } from "../Home";
 import { socketContext } from "../Home";
+import TextField from "./Login/TextField";
 
 function ChatBox({ userId }) {
 	const { socket } = useContext(socketContext);
@@ -26,18 +27,24 @@ function ChatBox({ userId }) {
 				actions.resetForm();
 			}}
 		>
-			<HStack as={"form"} w="100%" pb="1rem" px="1.2em">
-				<Input
-					as={Field}
-					name="message"
-					placeholder="Type message here..."
-					size="lg"
-					autoComplete="off"
-				/>
-				<Button type="submit" size="lg" colorScheme="teal">
-					Send
-				</Button>
-			</HStack>
+			{(formik) => (
+				<HStack
+					as={"form"}
+					w="100%"
+					pb="1rem"
+					px="1.2em"
+					align="center"
+				>
+					<TextField
+						name="message"
+						placeholder="Enter message ..."
+						autoComplete="off"
+					/>
+					<Button type="submit" size="md" colorScheme="teal">
+						Send
+					</Button>
+				</HStack>
+			)}
 		</Formik>
 	);
 }
