@@ -1,16 +1,22 @@
-import { Outlet, Navigate } from 'react-router-dom';
-import { AccountContext } from '../Context/AccountContext';
-import { useContext } from 'react';
+import { Outlet, Navigate } from "react-router-dom";
+import { AccountContext } from "../Context/AccountContext";
+import { useContext } from "react";
 
 const useAuth = () => {
-	const {user} = useContext(AccountContext)
-	return user && user.loggedIn;
-	// return true
+	const { user, loading } = useContext(AccountContext);
+	return [user && user.loggedIn, loading];
 };
 
 const PrivateRoutes = () => {
-	const isAuth = useAuth();
-	return isAuth ? <Outlet /> : <Navigate to={"/"} />;
+	const [isAuth, loading] = useAuth();
+	if (loading) {
+		return <div style={{width:"100vw", display:"grid", placeItems:"center", fontSize:"1.5rem", height:"100vh"}}>loading...</div>;
+	} else if (isAuth) {
+		return <Outlet />;
+	} else {
+		<Navigate to={"/"} />;
+	}
+
 };
 
 export default PrivateRoutes;

@@ -9,9 +9,6 @@ import { useContext,useEffect } from "react";
 function Login() {
 	const navigate = useNavigate();
 	const { setUser } = useContext(AccountContext);
-	useEffect(() => {
-		localStorage.removeItem("token")
-	})
 
 	return (
 		<Formik
@@ -28,7 +25,7 @@ function Login() {
 			})}
 			onSubmit={(values, actions) => {
 				const vals = { ...values };
-				fetch("http://localhost:5050/auth/login", {
+				fetch(process.env.REACT_APP_SEVER_URL+"/auth/login", {
 					method: "POST",
 					credentials: "include",
 					headers: {

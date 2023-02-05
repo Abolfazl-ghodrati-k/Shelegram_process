@@ -9,9 +9,11 @@ module.exports.handleLogin = async (req, res) => {
 		res.json({ loggedIn: false, message: "send Token!" });
 		return;
 	}
+
 	jwtVerify(token)
 		.then((decoded) => {
-			res.json({ loggedIn: true, token: token });
+			const username = decoded.username;
+			res.json({ loggedIn: true, token: token, username });
 			return;
 		})
 		.catch((err) => {
@@ -34,6 +36,7 @@ module.exports.handleSignUp = async (req, res) => {
 			"INSERT INTO users(username, passhash, userId) values($1,$2,$3) RETURNING id, userId",
 			[req.body.username, hashedPass, uuidV4()]
 		);
+		const username = req.body.username;
 		jwtSign(
 			{
 				username: req.body.username,
@@ -43,7 +46,11 @@ module.exports.handleSignUp = async (req, res) => {
 			{ expiresIn: "1year" }
 		)
 			.then((token) => {
-				res.json({ loggedIn: true, token });
+				res.json({
+					loggedIn: true,
+					token,
+					username,
+				});
 				return;
 			})
 			.catch((err) => {
@@ -68,6 +75,8 @@ module.exports.SignInAttempt = async (req, res) => {
 			potentialLogin.rows[0].passhash
 		);
 		if (isSamePass) {
+			const username = req.body.username;
+
 			jwtSign(
 				{
 					username: req.body.username,
@@ -77,7 +86,7 @@ module.exports.SignInAttempt = async (req, res) => {
 				{ expiresIn: "1year" }
 			)
 				.then((token) => {
-					res.json({ loggedIn: true, token });
+					res.json({ loggedIn: true, token, username });
 					return;
 				})
 				.catch((err) => {

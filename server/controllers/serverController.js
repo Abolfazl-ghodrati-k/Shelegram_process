@@ -1,7 +1,7 @@
 
 
 const corsConfig = {
-	origin: "http://127.0.0.1:5000",
+	origin: process.env.CLIENT_URL,
 	credentials: true,
 };
 module.exports = { corsConfig };

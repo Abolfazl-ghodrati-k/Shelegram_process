@@ -33,7 +33,6 @@ module.exports.initializeUser = async (socket) => {
 		-1
 	);
 	const parsedFriendList = await parseFriendList(FriendList);
-	console.log(parsedFriendList);
 	const friendRooms = parsedFriendList.map((friend) => friend.userId);
 	if (friendRooms.length > 0)
 		socket.to(friendRooms).emit("connected", true, socket.user.username);
@@ -55,7 +54,7 @@ module.exports.initializeUser = async (socket) => {
 };
 
 module.exports.Disconnect = async (socket) => {
-	console.log('disconnected')
+	console.log("disconnected");
 	await redisClient.hset(
 		`userid:${socket.user.username}`,
 		"connected",
@@ -79,8 +78,11 @@ module.exports.AddFriend = async (socket, friendName, cb) => {
 		cb({ done: false, errMsg: "cannot add self" });
 		return;
 	}
-	if (!Object.keys(friend).length) {
-		cb({ done: false, errMsg: "User Doesnt exist" });
+	if (!Object.keys(friend).length > 0) {
+		cb({
+			done: false,
+			errMsg: "User Doesnt exist make sure your friend owns an account",
+		});
 		return;
 	}
 
@@ -118,7 +120,7 @@ const parseFriendList = async (friendList) => {
 				newFriendList.push({
 					username: parsedFriend[0],
 					userId: parsedFriend[1],
-					connected: friendConnected == 'true',
+					connected: friendConnected == "true",
 				});
 			}
 		}
@@ -126,15 +128,73 @@ const parseFriendList = async (friendList) => {
 	return newFriendList;
 };
 
-module.exports.dm = async (socket, message) => {
+module.exports.dm = async (socket, message, cb) => {
 	const parsedMessage = { ...message, from: socket.user.userId };
 	const messageString = [
 		parsedMessage.to,
 		parsedMessage.from,
 		parsedMessage.content,
 	].join(".");
-	await redisClient.lpush(`chat:${message.to}`, messageString);
-	await redisClient.lpush(`chat:${socket.user.userId}`, messageString);
+	var sender = socket.user;
+	const senderUsername = socket.user.username;
+	const recieverName = parsedMessage.recieverName;
+	const recieverId = parsedMessage.to;
+	const recieversFriends = await redisClient.lrange(
+		`friends:${recieverName}`,
+		0,
+		-1
+	);
+	const parsedRecieversFriends = await parseFriendList(recieversFriends);
+	var friend = {};
+	parsedRecieversFriends.map((Friend) => {
+		if (Friend.username == senderUsername) {
+			friend = { ...Friend };
+		}
+	});
 
-	socket.to(parsedMessage.to).emit("dm", parsedMessage);
+	if (!Object.keys(friend).length > 0) {
+		console.log("adding friend");
+		await redisClient.lpush(
+			`friends:${recieverName}`,
+			[socket.user.username, socket.user.userId].join(".")
+		);
+		// console.log(friend)
+		parsedRecieversFriends.push({
+			...sender,
+			connected: true,
+		});
+		await redisClient.lpush(`chat:${message.to}`, messageString);
+		await redisClient.lpush(`chat:${socket.user.userId}`, messageString);
+		socket.to(recieverId).emit("friends", parsedRecieversFriends);
+		const msgQuery = await redisClient.lrange(
+			`chat:${message.to}`,
+			0,
+			-1
+		);
+		const messages = msgQuery.map((msgStr) => {
+			const parsedStr = msgStr.split(".");
+			return { to: parsedStr[0], from: parsedStr[1], content: parsedStr[2] };
+		});
+		if (messages && messages.length > 0) {
+			socket.to(message.to).emit("messages", messages);
+		}
+        cb({done: true, newMsg: parsedMessage})
+
+	} else {
+		await redisClient.lpush(`chat:${message.to}`, messageString);
+		await redisClient.lpush(`chat:${socket.user.userId}`, messageString);
+		const msgQuery = await redisClient.lrange(
+			`chat:${message.to}`,
+			0,
+			-1
+		);
+		const messages = msgQuery.map((msgStr) => {
+			const parsedStr = msgStr.split(".");
+			return { to: parsedStr[0], from: parsedStr[1], content: parsedStr[2] };
+		});
+		if (messages && messages.length > 0) {
+			socket.to(message.to).emit("messages", messages);
+		}
+        cb({done: true, newMsg: parsedMessage})
+	}
 };

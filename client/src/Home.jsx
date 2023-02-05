@@ -18,8 +18,8 @@ function Home() {
 	const [friendIndex, setfriendIndex] = useState(0);
 	const [socket, setSocket] = useState(() => SocketConn(user));
 	// console.log(user)
-	useSocketSetup( setFriendList, setMessages, socket);
-	
+	useSocketSetup(FriendList, setFriendList, setMessages, socket);
+
 	useEffect(() => {
 		setSocket(() => SocketConn(user));
 	}, [user]);
@@ -30,7 +30,7 @@ function Home() {
 				<Grid
 					templateColumns={"repeat(10,1fr)"}
 					as={Tabs}
-					onChange={(index) => setFriendIndex(index)}
+					onChange={(index) => setfriendIndex(index)}
 				>
 					<GridItem colSpan={3} borderRight={"1px solid gray"}>
 						<SideBar />
@@ -39,7 +39,16 @@ function Home() {
 						<MessagesContext.Provider
 							value={{ Messages, setMessages }}
 						>
-							<Chat userId={FriendList.length>0 ? FriendList[0].userId : null} />
+							{FriendList && (
+								<Chat
+									userId={
+										FriendList.length > 0 ? FriendList[friendIndex].userId : null
+									}
+									username={
+										FriendList.length > 0 ? FriendList[friendIndex].username : null
+									}
+								/>
+							)}
 						</MessagesContext.Provider>
 					</GridItem>
 				</Grid>

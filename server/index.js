@@ -10,7 +10,7 @@ const { corsConfig } = require("./controllers/serverController");
 require("dotenv").config();
 const io = new Server(server, {
 	cors: {
-		origin: ["http://127.0.0.1:5000"],
+		origin: [process.env.CLIENT_URL],
 		credentials: true,
 	},
 });
@@ -23,7 +23,6 @@ const {
 	initializeUser,
 } = require("./controllers/socketController");
 const authRouter = require("./routes/authRouter");
-const { jwtVerify } = require("./controllers/jwt/jwtAuth");
 // --------------------------------------------------------------------------
 //                              app middleware
 // --------------------------------------------------------------------------
@@ -31,6 +30,7 @@ app.use(helmet());
 app.use(cors(corsConfig));
 app.use(express.json());
 app.use("/auth", authRouter);
+app.set("trust proxy", 1)
 // --------------------------------------------------------------------------
 //                              app running
 // --------------------------------------------------------------------------
@@ -45,7 +45,7 @@ io.on("connection", (socket) => {
 		AddFriend(socket, friendName, cb);
 	});
 	socket.on("disconnect", () => Disconnect(socket));
-	socket.on("dm", (message) => dm(socket, message));
+	socket.on("dm", (message, cb) => dm(socket, message, cb));
 });
 
 server.listen(5050, () => {

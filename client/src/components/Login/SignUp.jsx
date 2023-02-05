@@ -10,9 +10,6 @@ import { AccountContext } from "../../Context/AccountContext";
 function SignUp() {
 	const navigate = useNavigate();
 	const { setUser } = useContext(AccountContext);
-	useEffect(() => {
-		localStorage.removeItem("token")
-	})
 
 	return (
 		<Formik
@@ -29,7 +26,7 @@ function SignUp() {
 			})}
 			onSubmit={(values, actions) => {
 				const vals = { ...values };
-				fetch("http://localhost:5050/auth/signup", {
+				fetch(process.env.REACT_APP_SEVER_URL+"/auth/signup", {
 					method: "POST",
 					credentials: "include",
 					headers: {
