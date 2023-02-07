@@ -12,12 +12,12 @@ const formSchema = Yup.object({
 });
 
 const validateForm = (req, res, next) => {
-	const formData = req.body;
+	const formData = req.body
 	// res.json(formData)
 	formSchema
 		.validate(formData)
 		.catch((err) => {
-			res.json({loggedIn: false, message: err})
+			res.json({loggedIn: false, message: "Validation Failed"})
 		})
 		.then((valid) => {
 			if (valid) {

@@ -8,4 +8,5 @@ const pool = new Pool({
    user: process.env.DATABASE_USER,
    port: process.env.DATABASE_PORT,
 })
+
 module.exports = pool

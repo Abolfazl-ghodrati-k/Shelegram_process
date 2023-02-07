@@ -12,7 +12,7 @@ services:
     environment:
       NODE_ENV: production
     volumes:
-      - .:/usr/src/app
+      - .:/var/lib/app
     ports:
       - 3000:3000
   redis:
@@ -23,7 +23,7 @@ services:
     ports:
       - "127.0.0.1:6379:6379"
     volumes:
-        - redis-data:/var/lib/postgresql/data
+        - redis-data:/var/lib/redis/data
   db: 
     image: postgres
     ports:
