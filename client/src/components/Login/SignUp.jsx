@@ -43,7 +43,7 @@ function SignUp() {
 			onSubmit={(values, actions) => {
 				const vals = { ...values };
 				setloading(true);
-				fetch(process.env.REACT_APP_BACKEND_URL+ "/auth/signup", {
+				fetch("https://shelegram-demo.iran.liara.run/auth/signup", {
 					method: "POST",
 					credentials: "include",
 					headers: {

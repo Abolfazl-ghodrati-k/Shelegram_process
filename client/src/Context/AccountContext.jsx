@@ -13,7 +13,7 @@ const UserContext = ({ children }) => {
 	useEffect(() => {
 		const fetchData = async () => {
 			setloading(true);
-			await fetch(process.env.REACT_APP_BACKEND_URL+"/auth/login", {
+			await fetch("https://shelegram-demo.iran.liara.run/auth/login", {
 				method: "GET",
 				headers: {
 					authorization: `Bearer ${user.token}`,

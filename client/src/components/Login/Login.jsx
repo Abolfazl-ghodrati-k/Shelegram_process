@@ -24,7 +24,7 @@ function Login() {
 		}
 		setTimeout(() => {
 			seterror("");
-		}, 2000);
+		}, 5000);
 	}
 
 	return (
@@ -43,7 +43,7 @@ function Login() {
 			onSubmit={(values, actions) => {
 				const vals = { ...values };
 				setloading(true);
-				fetch(`${process.env.REACT_APP_BACKEND_URL}/auth/login`, {
+				fetch(`https://shelegram-demo.iran.liara.run/auth/login`, {
 					method: "POST",
 					credentials: "include",
 					headers: {
