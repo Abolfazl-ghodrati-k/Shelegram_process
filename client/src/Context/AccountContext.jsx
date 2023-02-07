@@ -13,7 +13,7 @@ const UserContext = ({ children }) => {
 	useEffect(() => {
 		const fetchData = async () => {
 			setloading(true);
-			await fetch(process.env.REACT_APP_SEVER_URL+"/auth/login", {
+			await fetch(import.meta.env.VITE_BACKEND_URL+"/auth/login", {
 				method: "GET",
 				headers: {
 					authorization: `Bearer ${user.token}`,

@@ -58,7 +58,7 @@ module.exports.handleSignUp = async (req, res) => {
 				return;
 			});
 	} else {
-		res.json({ loggedIn: false, status: "Username taken" });
+		res.json({ loggedIn: false, message: "Username taken" });
 		return;
 	}
 };

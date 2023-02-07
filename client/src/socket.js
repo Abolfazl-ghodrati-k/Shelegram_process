@@ -1,7 +1,7 @@
 import { io } from "socket.io-client";
 
 const socket = (user) =>
-	new io(process.env.REACT_APP_SEVER_URL, {
+	new io(import.meta.env.VITE_BACKEND_URL, {
 		autoConnect: false,
 		withCredentials: true,
 		transports: ['websocket'],

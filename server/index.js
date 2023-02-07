@@ -48,6 +48,6 @@ io.on("connection", (socket) => {
 	socket.on("dm", (message, cb) => dm(socket, message, cb));
 });
 
-server.listen(5050, () => {
+server.listen(3000, () => {
 	console.log("listening on *:5050");
 });

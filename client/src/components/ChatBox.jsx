@@ -47,7 +47,7 @@ function ChatBox({ userId, username }) {
 				>
 					<TextField
 						name="message"
-						placeholder={username}
+						placeholder={`SendMessage to ${username}`}
 						autoComplete="off"
 					/>
 					<Button type="submit" size="md" colorScheme="teal">

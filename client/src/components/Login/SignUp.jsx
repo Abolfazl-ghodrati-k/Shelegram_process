@@ -1,15 +1,31 @@
-import { VStack, ButtonGroup, Button, Heading } from "@chakra-ui/react";
+import { VStack, ButtonGroup, Button, Heading, Text } from "@chakra-ui/react";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import TextField from "./TextField";
 import { useNavigate } from "react-router-dom";
 import { ArrowBackIcon } from "@chakra-ui/icons";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AccountContext } from "../../Context/AccountContext";
 
 function SignUp() {
 	const navigate = useNavigate();
 	const { setUser } = useContext(AccountContext);
+	const [error, seterror] = useState("");
+	const [loading, setloading] = useState(false);
+	function setError(err) {
+		if (err) {
+			setloading(false);
+			seterror(err.message);
+		} else {
+			setloading(false);
+			seterror(
+				"something went wrong, send your feedback to this email:\n abgkcode@gmail.com"
+			);
+		}
+		setTimeout(() => {
+			seterror("");
+		}, 2000);
+	}
 
 	return (
 		<Formik
@@ -26,7 +42,8 @@ function SignUp() {
 			})}
 			onSubmit={(values, actions) => {
 				const vals = { ...values };
-				fetch(process.env.REACT_APP_SEVER_URL+"/auth/signup", {
+				setloading(true);
+				fetch(import.meta.env.VITE_BACKEND_URL + "/auth/signup", {
 					method: "POST",
 					credentials: "include",
 					headers: {
@@ -36,21 +53,32 @@ function SignUp() {
 				})
 					.catch((err) => {
 						console.log(err);
+						setError(err);
 						localStorage.removeItem("token");
 						return;
 					})
 					.then((res) => {
 						if (!res || !res.ok || res.status >= 400) {
+							setError();
 							localStorage.removeItem("token");
 							return;
 						}
 						return res.json();
 					})
 					.then((data) => {
-						if (!data) return;
-						console.log(`signing up :`, data);
-						setUser({ ...data });
-						navigate("/home");
+						if (!data) {
+							setError();
+							return;
+						} else {
+							console.log(`signing up :`, data);
+							if (data.loggedIn) {
+								setUser({ ...data });
+								setloading(false);
+								navigate("/home");
+							} else {
+								setError(data);
+							}
+						}
 					});
 			}}
 		>
@@ -84,7 +112,7 @@ function SignUp() {
 					/>
 					<ButtonGroup pt={"1rem"}>
 						<Button colorScheme={"teal"} type="submit">
-							Sign Up
+							{loading ? "Loading..." : "Sign Up"}
 						</Button>
 						<Button
 							onClick={() => navigate("/")}
@@ -93,6 +121,9 @@ function SignUp() {
 							Back
 						</Button>
 					</ButtonGroup>
+					<Text color="red.300" align="center" mt="15px">
+						{error && error}
+					</Text>
 				</VStack>
 			)}
 		</Formik>

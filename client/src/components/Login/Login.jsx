@@ -1,14 +1,31 @@
-import { VStack, ButtonGroup, Button, Heading } from "@chakra-ui/react";
+import { VStack, ButtonGroup, Button, Heading, Text } from "@chakra-ui/react";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import TextField from "./TextField";
 import { useNavigate } from "react-router-dom";
 import { AccountContext } from "../../Context/AccountContext";
-import { useContext,useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 
 function Login() {
 	const navigate = useNavigate();
 	const { setUser } = useContext(AccountContext);
+	const [error, seterror] = useState("");
+	const [loading, setloading] = useState(false);
+	function setError(err) {
+		console.log(err)
+		if (err) {
+			setloading(false);
+			seterror(err);
+		} else {
+			setloading(false);
+			seterror(
+				"something went wrong, send your feedback to this email:\n abgkcode@gmail.com"
+			);
+		}
+		setTimeout(() => {
+			seterror("");
+		}, 2000);
+	}
 
 	return (
 		<Formik
@@ -25,7 +42,8 @@ function Login() {
 			})}
 			onSubmit={(values, actions) => {
 				const vals = { ...values };
-				fetch(process.env.REACT_APP_SEVER_URL+"/auth/login", {
+				setloading(true);
+				fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/login`, {
 					method: "POST",
 					credentials: "include",
 					headers: {
@@ -36,21 +54,32 @@ function Login() {
 				})
 					.catch((err) => {
 						console.log(err);
+						setError(err);
 					})
 					.then((res) => {
 						if (!res || !res.ok || res.status >= 400) {
+							setError(null);
 							return;
 						}
 						return res.json();
 					})
 					.then((data) => {
-						if (!data) return;
-						console.log(`logging in :`, data)
-						setUser({ ...data });
-						localStorage.setItem("token", data.token);
-						navigate("/home");
+						if (!data) {
+							console.log("no data");
+							setError(null);
+							return;
+						} else {
+							console.log(`logging in :`, data);
+							if (data.loggedIn) {
+								setUser({ ...data });
+								setloading(false);
+								localStorage.setItem("token", data.token);
+								navigate("/home");
+							} else {
+								setError(data.message);
+							}
+						}
 					});
-				actions.resetForm();
 			}}
 		>
 			{(formik) => (
@@ -83,7 +112,7 @@ function Login() {
 					/>
 					<ButtonGroup pt={"1rem"}>
 						<Button colorScheme={"teal"} type="submit">
-							Log In
+							{loading ? "Loading..." : "Log In"}
 						</Button>
 						<Button
 							onClick={() => {
@@ -93,6 +122,9 @@ function Login() {
 							Create Acount
 						</Button>
 					</ButtonGroup>
+					<Text color="red.300" align="center" mt="15px">
+						{error && error}
+					</Text>
 				</VStack>
 			)}
 		</Formik>
