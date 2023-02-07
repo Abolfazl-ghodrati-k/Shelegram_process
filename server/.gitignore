@@ -1,5 +1,2 @@
 /node_modules
 /.vscode
-Dockerfile
-docker-compose.yml
-docker-compose.debug.yml

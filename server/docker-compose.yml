@@ -1,0 +1,44 @@
+version: '3.4'
+
+services:
+  server:
+    image: server:1.0
+    depends_on:
+      - redis
+      - db
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    environment:
+      NODE_ENV: production
+    volumes:
+      - .:/usr/src/app
+    ports:
+      - 3000:3000
+  redis:
+    container_name: redislocal
+    hostname: redislocal
+    image: redis
+    command: redis-server --appendonly yes --requirepass Tsolm!571080
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+        - redis-data:/var/lib/postgresql/data
+  db: 
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=whatsapp
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=Tsolm!571080
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHEL", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+volumes:
+  db-data:
+  redis-data:
