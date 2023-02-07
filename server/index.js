@@ -29,7 +29,7 @@ const authRouter = require("./routes/authRouter");
 app.use(helmet());
 app.use(cors(corsConfig));
 app.use(express.json());
-app.use("/auth", authRouter);
+app.use("/auth", authRouter)
 app.set("trust proxy", 1)
 // --------------------------------------------------------------------------
 //                              app running
@@ -48,6 +48,6 @@ io.on("connection", (socket) => {
 	socket.on("dm", (message, cb) => dm(socket, message, cb));
 });
 
-server.listen(3000, () => {
+server.listen(3000, async () => {
 	console.log("listening on *:5050");
 });

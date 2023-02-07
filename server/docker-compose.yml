@@ -1,20 +1,20 @@
 version: '3.4'
 
 services:
-  server:
-    image: server:1.0
-    depends_on:
-      - redis
-      - db
-    build:
-      context: .
-      dockerfile: ./Dockerfile
-    environment:
-      NODE_ENV: production
-    volumes:
-      - .:/var/lib/app
-    ports:
-      - 3000:3000
+  # server:
+  #   image: server:1.0
+  #   depends_on:
+  #     - redis
+  #     - db
+  #   build:
+  #     context: .
+  #     dockerfile: ./Dockerfile
+  #   environment:
+  #     NODE_ENV: production
+  #   volumes:
+  #     - .:/var/lib/app
+  #   ports:
+  #     - 3000:3000
   redis:
     container_name: redislocal
     hostname: redislocal

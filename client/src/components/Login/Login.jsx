@@ -43,7 +43,7 @@ function Login() {
 			onSubmit={(values, actions) => {
 				const vals = { ...values };
 				setloading(true);
-				fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/login`, {
+				fetch(`${process.env.REACT_APP_BACKEND_URL}/auth/login`, {
 					method: "POST",
 					credentials: "include",
 					headers: {
